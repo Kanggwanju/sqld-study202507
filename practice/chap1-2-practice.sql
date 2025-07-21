@@ -10,7 +10,7 @@ FROM POSTS
 ;
 
 -- 문제 3. '좋아요'를 누른 사용자는 누구누구?
-SELECT ALL USER_ID
+SELECT DISTINCT USER_ID
 FROM LIKES
 ;
 
@@ -23,9 +23,9 @@ FROM USER_PROFILES
 
 -- 문제 5. 나만의 댓글 알림 만들기
 SELECT USER_ID 
-  || '번 사용자가 ' 
-  || COMMENT_TEXT 
-  || '라고 댓글을 남겼습니다.' 
+  || '번 사용자가 '
+  || COMMENT_TEXT
+  || '라고 댓글을 남겼습니다.'
   AS "댓글 알림"
 FROM COMMENTS
 ;
