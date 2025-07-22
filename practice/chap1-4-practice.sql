@@ -28,8 +28,8 @@ FROM USERS
 SELECT
   COMMENT_ID
   , CASE MOD(COMMENT_ID, 2)
-    WHEN 1 THEN '짝수 댓글'
-    ELSE '홀수 댓글'
+    WHEN 1 THEN '홀수 댓글'
+    ELSE '짝수 댓글'
   END AS "댓글 유형"
 FROM COMMENTS
 ;
