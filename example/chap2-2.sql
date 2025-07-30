@@ -144,3 +144,148 @@ WHERE POST_ID IN (
   )
 )
 ;
+
+-- 인라인 뷰 서브쿼리 (FROM 절에 서브쿼리 사용)
+-- 사용자별 피드 작성 개수
+SELECT 
+  U.USER_ID,
+  U.USERNAME,
+  PC.POST_COUNT
+FROM (
+  SELECT USER_ID, COUNT(*) AS POST_COUNT
+  FROM POSTS
+  GROUP BY USER_ID
+) PC
+JOIN USERS U
+ON PC.USER_ID = U.USER_ID
+;
+
+
+SELECT 
+  U.USER_ID,
+  U.USERNAME,
+  PC.POST_COUNT
+FROM USERS U
+JOIN (
+  SELECT USER_ID, COUNT(*) AS POST_COUNT
+  FROM POSTS
+  GROUP BY USER_ID
+) PC
+ON PC.USER_ID = U.USER_ID
+;
+
+
+SELECT
+  USER_ID,
+  COUNT(*) AS total_likes
+FROM LIKES
+GROUP BY USER_ID
+ORDER BY USER_ID
+;
+
+SELECT
+  USER_ID,
+  U.USERNAME,
+  A.total_likes
+FROM (
+  SELECT
+    USER_ID,
+    COUNT(*) AS total_likes
+  FROM LIKES
+  GROUP BY USER_ID
+) A
+NATURAL JOIN USERS U
+-- ON A.USER_ID = U.USER_ID
+;
+
+
+
+-- 스칼라 서브쿼리 (SELECT 절에 서브쿼리 사용)
+-- 유저정보를 조회(USERS) + 상세 bio(USER_PROFILES)도 같이 조회
+SELECT * FROM USERS;
+SELECT * FROM USER_PROFILES;
+
+-- UP에서 BIO 하나 꺼내려고 JOIN하는게 낭비
+SELECT
+  U.USER_ID,
+  U.USERNAME,
+  UP.BIO
+FROM USERS U
+JOIN USER_PROFILES UP
+ON U.USER_ID = UP.USER_ID
+;
+
+-- 스칼라 서브쿼리 == 연관 서브쿼리
+-- 연관 서브쿼리: 서브쿼리가 한 번 실행되고 끝나는게 아니라
+-- 바깥쪽 메인쿼리 한 행을 실행할때마다 연관 서브쿼리를 반복실행
+-- 스칼라 서브쿼리에선 USERS의 USER_ID에 맞는 행만 가져와야함
+SELECT
+  U.USER_ID,
+  U.USERNAME,
+  (SELECT BIO FROM USER_PROFILES UP WHERE U.USER_ID = UP.USER_ID) AS BIO
+FROM USERS U
+;
+
+
+-- 피드별로 피드의 ID와 피드의 내용과 각 피드가 받은 좋아요 수를 조회
+SELECT
+  P.POST_ID,
+  P.CONTENT
+FROM POSTS P
+;
+
+SELECT POST_ID, COUNT(*) AS LIKE_COUNT
+FROM LIKES
+GROUP BY POST_ID
+ORDER BY POST_ID
+;
+
+SELECT
+  POST_ID,
+  COUNT(*) AS REPLY_COUNT
+FROM COMMENTS
+GROUP BY POST_ID
+ORDER BY POST_ID
+;
+
+SELECT
+  P.POST_ID,
+  P.CONTENT,
+  NVL(LC.LIKE_COUNT, 0) AS LIKE_COUNT,
+  NVL(RC.REPLY_COUNT, 0) AS REPLY_COUNT
+FROM POSTS P
+LEFT OUTER JOIN (
+  SELECT
+    POST_ID,
+    COUNT(*) AS LIKE_COUNT
+  FROM LIKES
+  GROUP BY POST_ID
+) LC
+ON P.POST_ID = LC.POST_ID
+LEFT OUTER JOIN (
+  SELECT
+    POST_ID,
+    COUNT(*) AS REPLY_COUNT
+  FROM COMMENTS
+  GROUP BY POST_ID
+) RC
+ON RC.POST_ID = P.POST_ID
+ORDER BY POST_ID
+;
+
+
+SELECT
+  p.post_id,
+  p.content,
+  (SELECT COUNT(*) FROM LIKES l WHERE l.post_id = p.post_id) AS "좋아요 수",
+  (SELECT COUNT(*) FROM COMMENTS c WHERE c.post_id = p.post_id) AS "댓글 수"
+FROM
+  POSTS p
+;
+
+
+
+
+
+
+
