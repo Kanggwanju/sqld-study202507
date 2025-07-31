@@ -1,0 +1,35 @@
+-- 문제 1. '라이언' 팀의 조직도
+SELECT * FROM USERS;
+
+SELECT
+  USER_ID,
+  LPAD(' ', (LEVEL-1) * 4) || USERNAME AS "라이언 팀 조직도",
+  MANAGER_ID
+FROM
+  USERS
+START WITH
+  USERNAME = 'ryan'
+CONNECT BY
+  PRIOR USER_ID = MANAGER_ID
+ORDER SIBLINGS BY
+  USERNAME ASC
+;
+
+
+-- 문제 2. 특정 댓글의 모든 답글 찾기
+SELECT * FROM COMMENTS;
+
+SELECT
+  LEVEL,
+  LPAD('└> ', (LEVEL-1) * 4) || COMMENT_TEXT AS "답글 계층 구조",
+  COMMENT_ID,
+  PARENT_COMMENT_ID
+FROM COMMENTS
+START WITH
+  -- comment_id = 20001
+  parent_comment_id = 20001 -- 시작점을 20001번의 '자식'들로 지정
+CONNECT BY
+  PRIOR COMMENT_ID = PARENT_COMMENT_ID
+;
+
+
