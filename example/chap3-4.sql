@@ -1,0 +1,21 @@
+
+CREATE USER marketer IDENTIFIED BY marketing123;
+
+GRANT CONNECT TO marketer;
+
+-- 1단계: PDB로 세션 변경
+ALTER SESSION SET CONTAINER = XEPDB1;
+
+-- 2단계: 현재 컨테이너 확인
+SELECT SYS_CONTEXT('USERENV', 'CON_NAME') FROM DUAL;
+
+-- 3단계: 사용자 생성
+CREATE USER HAHA IDENTIFIED BY 1234;
+
+-- 4단계: 권한 부여
+GRANT CREATE SESSION TO HAHA;
+GRANT CONNECT TO HAHA;  -- 추가 권한
+
+-- system, oracle으로 접속
+-- CONNECT HAHA/1234@localhost:1521/XEPDB1;
+
